@@ -1,0 +1,149 @@
+import os
+import csv
+import requests
+from unidecode import unidecode
+from bs4 import BeautifulSoup
+import math
+csv_columns = ["url","name","img","newprice",  "oldprice","category"]
+currentPath = os.getcwd()
+csv_file = "SouqScrape.csv"
+j=0
+def WriteDictToCSV(dict_data):
+	global csv_columns
+	global csv_file
+	global j
+	try:
+		with open(csv_file, 'a+') as csvfile:
+			writer = csv.DictWriter(csvfile, delimiter=',', lineterminator='\n', fieldnames=csv_columns)
+			if j == 0:
+				writer.writeheader()
+				j=1
+			
+			for data in dict_data:
+				writer.writerow(data)
+				
+		return 1
+	except Exception as e:
+		print(str(e))
+		return 0
+
+def get_scrape(url,text):
+	try:
+		no_of_pages=0
+		response = requests.get(url)
+		data = response.content
+		soup = BeautifulSoup(data, "html.parser")
+		data=list()
+		list_thumb = soup.findAll("div" , attrs={'class':'placard'})
+		for product in list_thumb:
+			image_div =product.find("div" , attrs={"class":"small-5"})
+			details_div=product.find("div" , attrs={"class":"small-7"})
+			if image_div:
+				image=image_div.find("img")
+			if details_div:
+				names =details_div.find("h6")
+				name=names.find("a")
+				oldprice = details_div.find("span" , attrs= {'class':'was'})
+				newprice = details_div.find("span" , attrs= {'class':'is'})
+			var={}
+			try:
+				var['img'] = unidecode(image['src'])
+				var['name'] = unidecode(name.text.strip())	
+				var['url']=unidecode(name['href'])
+				var['oldprice']=unidecode(oldprice.text.strip())
+				var['newprice']=unidecode(newprice.text.strip())
+				var ['category']=unidecode(text)
+			except:
+				print("eror")
+				return
+			data.append(var)
+		WriteDictToCSV(data)
+		return
+	except Exception as e:
+		print(str(e))
+		return
+	# def  get_data( page,text ):
+		# content_array=[' ' ,' ' , ' ' , ' ' , ' ' , ' ', ' ',' ','souq UAE ']
+		# content_array[7]=page
+		# response = requests.get(page)
+		# data = response.content
+		# soup = BeautifulSoup(data)
+		# content_array[0]=soup.find('h1').getText()
+		# aa= soup.findAll('h6',attrs={'class':'byline'})
+		# i=1		
+		# for se in aa:
+			# for li in se.findAll('a'):
+				# content_array[i]=li.text
+				# #print str(content_array[i]) + " hi"
+				# #print "hi " + str(i)
+				# i=i+1
+				
+		# aa= soup.findAll('div',attrs={'id':'specs-full'})
+		# flag = 0
+		# for aaa in aa:
+			# for dl in aaa.findAll('dt'):
+				# if dl.text == 'Item EAN':
+					# content_array[3]=dl.next_sibling.text
+					# flag=1;
+		# if(flag == 0):
+			# aa= soup.findAll('dl',attrs={'class':'stats'})
+			# for aaa in aa:
+				# for dl in aaa.findAll('dt'):
+					# if dl.text == 'Item EAN':
+						# content_array[3]=dl.next_sibling.text
+					# flag=1;
+		
+		# xyz=soup.findAll('section',attrs={'class':'price-messaging'})
+		# for aaaa in xyz:
+			# for dl in aaaa.findAll('h3'):
+				# content_array[4]=dl.contents[1] 
+				# content_array[5]=dl.contents[2].text
+				# break
+		# content_array[6]=text;
+		# stri= '"'+content_array[0]+'","'+content_array[1]+'","'+content_array[2]+'","'+content_array[3]+'","'+content_array[4]+'","'+content_array[5]+'","'+content_array[6]+'","'+content_array[7]+'","'+content_array[8]+'"'
+		# #stri=stri.decode("utf-8")
+		# #stri.encode("utf-8").replace(u"\xa0", " ")
+		# #stri.encode("utf-8").replace(b"xc2", " ")
+		# print (unidecode(stri))
+
+
+	# def get_link(page,text):
+		# for item in soup.findAll('a',attrs={'class':'itemLink'}):
+			# print( item['href'],text) 
+	
+def get_link(url , text):
+	try:
+		no_of_pages=0
+		response = requests.get(url)
+		data = response.content
+		soup = BeautifulSoup(data, "html.parser")
+		link=soup.find('div', attrs={'class' : 'listing-page-text'})
+		if link:
+			link=unidecode(link.text.strip())
+			try:
+				results=float(link.split(" ")[0])
+				print(results)
+				no_of_pages =math.ceil(results/15)
+                                                                                print(no_of_pages)
+			except Exception as e:
+				print(str(e))
+				return
+		else:
+			return;
+		count=0
+		while (no_of_pages > 0): 
+			count=count + 1
+			no_of_pages=no_of_pages - 1
+			get_scrape(url+'&page='+str(count) , text)		
+			break;
+		return
+	except Exception as e:
+		print(str(e))
+		return
+with open('souq_uae_cat.csv') as csvfile:
+	reader=csv.DictReader(csvfile, delimiter=";")
+	for row in reader:
+		print(row['category'])
+		get_link(row['url']+"?sortby=cp_asc",row['category'])
+		print ("0"+"\n")
+		break;
