@@ -17,14 +17,21 @@ if ($res=$conn->query($sql)){
 				else{
 					$_SESSION['lastscrape']="none";
 					print_r($_SESSION);
-					header('location:index.php');
+					foreach($_GET as $k=>$v){
+						if($k=='sa')
+							header('location:sa.php');
 
-					
+						if($k=='uae')
+							header('location:uae.php');
+					}
+
+
+
 			}
 				}
-			
+
 		}
-		
+
 	}
 }
 else

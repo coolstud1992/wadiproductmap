@@ -2,7 +2,15 @@
 session_start();
 $cat=$_SESSION['category'];
 include('connection.php');
-$sql="select * from wadi_uae where Category='$cat'";
+$source=$_POST['source'];
+$sql="select * from $source where Category='$cat'";
+//echo $sql;
+//foreach($_GET as $k=>$v) {
+//	if ($k == 'sa')
+//		$sql = "select * from wadi_sa where Category='$cat'";
+//	if ($k == 'uae')
+//		$sql = "select * from wadi_uae where Category='$cat'";
+//}
 if(!$conn->query($sql))
 	echo mysqli_error($conn);
 else

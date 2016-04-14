@@ -1,3 +1,20 @@
+function switchView(){
+	if(source=='wadi_uae_uploads')
+		source='wadi_uae'
+	else
+		source='wadi_uae_uploads'
+	$.ajax({
+		type: 'POST',
+		url: 'setsource.php',
+		data: {source:source},
+		async : false,
+		success : function(data){alert(data)
+			location.reload();
+		}
+	})
+
+}
+
 function logout(){
 	$.ajax({
 		type : 'POST',
@@ -148,7 +165,7 @@ function loadDevices_souq(i)
 	  $.ajax({
         type: "POST",
         url: "get_souq.php",
-        data:{wadi:wadi.Device_ID},
+        data:{wadi:wadi.Device_ID,source:source},
         async:false,
         success: function(data) {
         	f=JSON.parse(data)

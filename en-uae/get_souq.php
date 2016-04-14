@@ -1,7 +1,11 @@
 <?php
 session_start();
 $wadi=$_POST['wadi'];
-$sql="select * from look where Device_ID='$wadi'";
+$source=$_POST['source'];
+if($source=='wadi_uae' || $source=='wadi_uae_uploads')
+	$sql="select * from look where Device_ID='$wadi'";
+else
+	$sql="select * from lookups_sa where Device_ID='$wadi'";
 include('connection.php');
 $res=$conn->query($sql);
 if($res){

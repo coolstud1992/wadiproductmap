@@ -92,7 +92,7 @@ def get_link(name,cat,wid):
 	    furl=response.url;
 	    print("final :" + furl + '\n')
 	else:
-	    print "Request was not redirected"
+	    print ("Request was not redirected")
 	    furl=url
 	    print(furl + '\n')
 	response=requests.get(furl)
@@ -109,13 +109,13 @@ def get_link(name,cat,wid):
 		print("\nNothing found")
 		return
 
-db=MySQLdb.connect('localhost','root','jlabs@123','wadi')
+db=MySQLdb.connect('localhost','root','','wadi')
 cursor=db.cursor()
 cursor.execute('select * from wadi_uae')
 res=cursor.fetchall()
 
 for row in res:
-	if(row[0]<=29444):
+	if(row[0]<=35360):
 		continue
 	else:
 		print("ID: " + str(row[0]))
